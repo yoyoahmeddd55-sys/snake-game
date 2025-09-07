@@ -47,6 +47,7 @@
 <script>
 let scene = new THREE.Scene();
 scene.background = new THREE.Color(0xe0c38c);
+
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
@@ -56,15 +57,18 @@ let light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(5, 10, 7);
 scene.add(light);
 
-let floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshLambertMaterial({ color: 0xe6d098 }));
+let floorGeometry = new THREE.PlaneGeometry(20, 20);
+let floorMaterial = new THREE.MeshLambertMaterial({ color: 0xe6d098 });
+let floor = new THREE.Mesh(floorGeometry, floorMaterial);
 floor.rotation.x = -Math.PI / 2;
 scene.add(floor);
 
 let wallMaterial = new THREE.MeshLambertMaterial({ color: 0xcc9b6d });
-scene.add(new THREE.Mesh(new THREE.BoxGeometry(20, 2, 0.5), wallMaterial));
-scene.add(new THREE.Mesh(new THREE.BoxGeometry(20, 2, 0.5), wallMaterial));
-scene.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 2, 20), wallMaterial));
-scene.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 2, 20), wallMaterial));
+let wall1 = new THREE.Mesh(new THREE.BoxGeometry(20, 2, 0.5), wallMaterial); wall1.position.set(0, 1, -10);
+let wall2 = wall1.clone(); wall2.position.set(0, 1, 10);
+let wall3 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2, 20), wallMaterial); wall3.position.set(-10, 1, 0);
+let wall4 = wall3.clone(); wall4.position.set(10, 1, 0);
+scene.add(wall1, wall2, wall3, wall4);
 
 let snake = [];
 let snakeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
@@ -93,6 +97,7 @@ window.addEventListener("keydown", e => {
   if(e.key === "ArrowRight") direction.set(1,0,0);
 });
 
+// أزرار لمس للجوال
 document.getElementById("up").addEventListener("touchstart", ()=>direction.set(0,0,-1));
 document.getElementById("down").addEventListener("touchstart", ()=>direction.set(0,0,1));
 document.getElementById("left").addEventListener("touchstart", ()=>direction.set(-1,0,0));
