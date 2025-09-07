@@ -1,82 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>3D Snake Game</title>
-  <style>
-    body { margin: 0; overflow: hidden; background: #e0c38c; }
-    #score {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-family: Arial, sans-serif;
-      font-size: 20px;
-      font-weight: bold;
-      color: #222;
-      background: rgba(255,255,255,0.7);
-      padding: 8px 12px;
-      border-radius: 8px;
-    }
-  </style>
+<meta charset="UTF-8">
+<title>3D Snake Game</title>
+<style>
+  body { margin: 0; overflow: hidden; background: #e0c38c; }
+  #score {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    font-family: Arial, sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    color: #222;
+    background: rgba(255,255,255,0.7);
+    padding: 8px 12px;
+    border-radius: 8px;
+  }
+  /* أزرار الجوال */
+  .btn {
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    background: rgba(255,255,255,0.7);
+    border-radius: 50%;
+    text-align: center;
+    line-height: 60px;
+    font-size: 24px;
+    font-weight: bold;
+    user-select: none;
+  }
+  #up { bottom: 120px; left: 50%; transform: translateX(-50%); }
+  #down { bottom: 40px; left: 50%; transform: translateX(-50%); }
+  #left { bottom: 80px; left: calc(50% - 80px); }
+  #right { bottom: 80px; left: calc(50% + 20px); }
+</style>
 </head>
 <body>
 <div id="score">SCORE: 0</div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+<div id="up" class="btn">↑</div>
+<div id="down" class="btn">↓</div>
+<div id="left" class="btn">←</div>
+<div id="right" class="btn">→</div>
 
+<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script>
 let scene = new THREE.Scene();
-scene.background = new THREE.Color(0xe0c38c); // أرضية بلون رملي
-
+scene.background = new THREE.Color(0xe0c38c);
 let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
 let renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
-// إضاءة
 let light = new THREE.DirectionalLight(0xffffff, 1);
 light.position.set(5, 10, 7);
 scene.add(light);
 
-// أرضية
-let floorGeometry = new THREE.PlaneGeometry(20, 20);
-let floorMaterial = new THREE.MeshLambertMaterial({ color: 0xe6d098 });
-let floor = new THREE.Mesh(floorGeometry, floorMaterial);
+let floor = new THREE.Mesh(new THREE.PlaneGeometry(20, 20), new THREE.MeshLambertMaterial({ color: 0xe6d098 }));
 floor.rotation.x = -Math.PI / 2;
 scene.add(floor);
 
-// جدران
+// الجدران
 let wallMaterial = new THREE.MeshLambertMaterial({ color: 0xcc9b6d });
-let walls = [];
-let wallGeometry = new THREE.BoxGeometry(20, 2, 0.5);
-
-// جدارين على Z
-let wall1 = new THREE.Mesh(wallGeometry, wallMaterial);
-wall1.position.set(0, 1, -10);
-let wall2 = wall1.clone();
-wall2.position.set(0, 1, 10);
-
-// جدارين على X
-let wall3 = new THREE.Mesh(new THREE.BoxGeometry(0.5, 2, 20), wallMaterial);
-wall3.position.set(-10, 1, 0);
-let wall4 = wall3.clone();
-wall4.position.set(10, 1, 0);
-
-scene.add(wall1, wall2, wall3, wall4);
+scene.add(new THREE.Mesh(new THREE.BoxGeometry(20, 2, 0.5), wallMaterial));
+scene.add(new THREE.Mesh(new THREE.BoxGeometry(20, 2, 0.5), wallMaterial));
+scene.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 2, 20), wallMaterial));
+scene.add(new THREE.Mesh(new THREE.BoxGeometry(0.5, 2, 20), wallMaterial));
 
 // الثعبان
 let snake = [];
 let snakeMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
-let snakeHeadGeo = new THREE.SphereGeometry(0.5, 16, 16);
-let head = new THREE.Mesh(snakeHeadGeo, snakeMaterial);
-head.position.set(0, 0.5, 0);
+let head = new THREE.Mesh(new THREE.SphereGeometry(0.5,16,16), snakeMaterial);
+head.position.set(0,0.5,0);
 scene.add(head);
 snake.push(head);
 
 // التفاحة
-let appleGeometry = new THREE.BoxGeometry(0.6, 0.6, 0.6);
-let appleMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
-let apple = new THREE.Mesh(appleGeometry, appleMaterial);
+let apple = new THREE.Mesh(new THREE.BoxGeometry(0.6,0.6,0.6), new THREE.MeshLambertMaterial({ color: 0xff0000 }));
 scene.add(apple);
 
 function placeApple() {
@@ -86,54 +87,55 @@ function placeApple() {
 }
 placeApple();
 
-let direction = new THREE.Vector3(1, 0, 0);
+let direction = new THREE.Vector3(1,0,0);
 let score = 0;
 
-window.addEventListener("keydown", (e) => {
-  if (e.key === "ArrowUp") direction.set(0, 0, -1);
-  if (e.key === "ArrowDown") direction.set(0, 0, 1);
-  if (e.key === "ArrowLeft") direction.set(-1, 0, 0);
-  if (e.key === "ArrowRight") direction.set(1, 0, 0);
+// تحكم بالكمبيوتر
+window.addEventListener("keydown", e => {
+  if(e.key === "ArrowUp") direction.set(0,0,-1);
+  if(e.key === "ArrowDown") direction.set(0,0,1);
+  if(e.key === "ArrowLeft") direction.set(-1,0,0);
+  if(e.key === "ArrowRight") direction.set(1,0,0);
 });
+
+// تحكم بالجوال
+document.getElementById("up").addEventListener("touchstart", ()=>direction.set(0,0,-1));
+document.getElementById("down").addEventListener("touchstart", ()=>direction.set(0,0,1));
+document.getElementById("left").addEventListener("touchstart", ()=>direction.set(-1,0,0));
+document.getElementById("right").addEventListener("touchstart", ()=>direction.set(1,0,0));
 
 function animate() {
   requestAnimationFrame(animate);
 
-  // تحريك الرأس
   let prevPos = head.position.clone();
-  head.position.addScaledVector(direction, 0.1);
+  head.position.addScaledVector(direction,0.1);
 
-  // تحريك الجسم
-  for (let i = 1; i < snake.length; i++) {
+  for(let i=1;i<snake.length;i++){
     let temp = snake[i].position.clone();
     snake[i].position.copy(prevPos);
     prevPos = temp;
   }
 
-  // أكل التفاحة
-  if (head.position.distanceTo(apple.position) < 0.5) {
+  if(head.position.distanceTo(apple.position)<0.5){
     score++;
-    document.getElementById("score").textContent = "SCORE: " + score;
+    document.getElementById("score").textContent = "SCORE: "+score;
     placeApple();
-    // إضافة جزء جديد
-    let bodyPart = new THREE.Mesh(new THREE.SphereGeometry(0.5, 16, 16), snakeMaterial);
+    let bodyPart = new THREE.Mesh(new THREE.SphereGeometry(0.5,16,16), snakeMaterial);
     bodyPart.position.copy(prevPos);
     scene.add(bodyPart);
     snake.push(bodyPart);
   }
 
-  // الموت إذا ضرب الجدار
-  if (Math.abs(head.position.x) > 9.5 || Math.abs(head.position.z) > 9.5) {
-    alert("Game Over! Final Score: " + score);
+  if(Math.abs(head.position.x)>9.5 || Math.abs(head.position.z)>9.5){
+    alert("Game Over! Final Score: "+score);
     window.location.reload();
   }
 
   renderer.render(scene, camera);
 }
 
-camera.position.set(0, 15, 15);
-camera.lookAt(0, 0, 0);
-
+camera.position.set(0,15,15);
+camera.lookAt(0,0,0);
 animate();
 </script>
 </body>
